@@ -574,7 +574,10 @@ class NNTagger(object):
         for line in open(lexiconfile).readlines():
             word,pos = line.strip().split("\t")
             if word in w2i.keys():
-                L[w2i[word]].add(l2i[pos])
+                try:
+                    L[w2i[word]].add(l2i[pos])
+                except:
+                    print("strange pair ",word, pos)
         L["LEX_POS"] = set([l2i[pos] for pos in lexpos])
         return L
 
