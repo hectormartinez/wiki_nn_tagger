@@ -195,18 +195,14 @@ class NNTagger(object):
         return -dynet.log(dynet.pick(pred, gold))
 
     def other_loss_function(self,pred,gold,word_id,lexicon):
-        #print("lossfunction",word_id,lexicon[word_id])
-        #print("pick",dynet.pick(pred, gold),dynet.pick(pred, gold).value(),pred.value(),gold)
         if len(lexicon[word_id]) > 0:
             n_labels = len(lexicon[word_id])
             return dynet.scalarInput(1/n_labels)*dynet.esum([-dynet.log(pred[k]) for k in sorted(lexicon[word_id])])
         else:
-            #n_labels = 2 #len(lexicon["LEX_POS"])
-            #return dynet.esum([-dynet.log(pred[k]) for k in sorted(lexicon["LEX_POS"])])
-            n_labels = len(lexicon["LEX_POS"])
-            return dynet.scalarInput(1/n_labels) * dynet.esum([-dynet.log(pred[k]) for k in sorted(lexicon["LEX_POS"])])
-
-
+            #n_labels = len(lexicon["LEX_POS"])
+            #return dynet.scalarInput(1/n_labels) * dynet.esum([-dynet.log(pred[k]) for k in sorted(lexicon["LEX_POS"])])
+            n_labels = len(lexicon["NOUN_POS"])
+            return dynet.scalarInput(1/n_labels) * dynet.esum([-dynet.log(pred[k]) for k in sorted(lexicon["NOUN_POS"])])
 
 
     def set_indices(self, w2i, c2i, task2t2i):
@@ -571,6 +567,8 @@ class NNTagger(object):
     def get_label_lexicon(self,lexiconfile,w2i,l2i):
         L = defaultdict(set)
         lexpos = ["NOUN", "VERB", "ADJ", "ADV", "X"]
+        noun_pos = ["NOUN"]
+
         for line in open(lexiconfile).readlines():
             word,pos = line.strip().split("\t")
             if word in w2i.keys():
@@ -579,6 +577,8 @@ class NNTagger(object):
                 except:
                     print("strange pair ",word, pos)
         L["LEX_POS"] = set([l2i[pos] for pos in lexpos])
+        L["NOUN_POS"] = set([l2i[pos] for pos in noun_pos])
+
         return L
 
     def save_embeds(self, out_filename):
