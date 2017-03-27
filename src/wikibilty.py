@@ -578,9 +578,9 @@ class NNTagger(object):
                 except:
                     print("strange pair ",word, pos)
 
-        for w in L.keys(): #Patch to keep only function 
-            if len(L[w].insersection(funcpos)) > 0:
-                L[w]= L[w].insersection(funcpos)
+        for w in L.keys(): #Patch to keep only function
+            if len(L[w].intersection(funcpos)) > 0:
+                L[w]= L[w].intersection(funcpos)
 
         L["LEX_POS"] = set([l2i[pos] for pos in lexpos])
         L["NOUN_POS"] = set([l2i[pos] for pos in noun_pos])
