@@ -199,10 +199,10 @@ class NNTagger(object):
             n_labels = len(lexicon[word_id])
             return dynet.scalarInput(1/n_labels)*dynet.esum([-dynet.log(pred[k]) for k in sorted(lexicon[word_id])])
         else:
-            #n_labels = len(lexicon["LEX_POS"])
-            #return dynet.scalarInput(1/n_labels) * dynet.esum([-dynet.log(pred[k]) for k in sorted(lexicon["LEX_POS"])])
-            n_labels = len(lexicon["NOUN_POS"])
-            return dynet.scalarInput(1/n_labels) * dynet.esum([-dynet.log(pred[k]) for k in sorted(lexicon["NOUN_POS"])])
+            n_labels = len(lexicon["LEX_POS"])
+            return dynet.scalarInput(1/n_labels) * dynet.esum([-dynet.log(pred[k]) for k in sorted(lexicon["LEX_POS"])])
+            #n_labels = len(lexicon["NOUN_POS"])
+            #return dynet.scalarInput(1/n_labels) * dynet.esum([-dynet.log(pred[k]) for k in sorted(lexicon["NOUN_POS"])])
 
 
     def set_indices(self, w2i, c2i, task2t2i):
@@ -568,6 +568,7 @@ class NNTagger(object):
         L = defaultdict(set)
         lexpos = ["NOUN", "VERB", "ADJ", "ADV", "X"]
         noun_pos = ["NOUN"]
+        funcpos =  set([".","ADP","CONJ","PRON","PRT"])
 
         for line in open(lexiconfile).readlines():
             word,pos = line.strip().split("\t")
@@ -576,6 +577,11 @@ class NNTagger(object):
                     L[w2i[word]].add(l2i[pos])
                 except:
                     print("strange pair ",word, pos)
+
+        for w in L.keys(): #Patch to keep only function 
+            if len(L[w].insersection(funcpos)) > 0:
+                L[w]= L[w].insersection(funcpos)
+
         L["LEX_POS"] = set([l2i[pos] for pos in lexpos])
         L["NOUN_POS"] = set([l2i[pos] for pos in noun_pos])
 
